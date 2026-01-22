@@ -44,7 +44,7 @@ Bu projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımlar�
 
 1.  **Projeyi Klonlayın:**
     ```bash
-    git clone https://github.com/yourusername/cvisulize.git
+    git clone https://github.com/berkcantmr/cvisulize.git
     cd cvisulize
     ```
 
@@ -86,4 +86,4 @@ Bu projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımlar�
 
 > *"The best way to learn memory management is to see it."*
 
-Developed with 💻 & ☕ by **Antigravity**
+Developed with 💻 & ☕ by **berkcantmr**
