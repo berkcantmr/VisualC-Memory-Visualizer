@@ -1,0 +1,420 @@
+:root {
+  --bg-color: #0f172a;
+  --text-color: #e2e8f0;
+  --primary-color: #3b82f6;
+  --secondary-color: #64748b;
+  --accent-color: #8b5cf6;
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --stack-item-bg: rgba(59, 130, 246, 0.15);
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background: radial-gradient(circle at top left, #1e293b, #0f172a);
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  background: linear-gradient(to right, #60a5fa, #c084fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 2.5rem;
+  letter-spacing: -0.05em;
+}
+
+.beta-tag {
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  vertical-align: middle;
+  -webkit-text-fill-color: var(--secondary-color);
+  border: 1px solid var(--glass-border);
+}
+
+.main-content {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+  min-height: 0;
+  /* Enable scrolling within if needed */
+}
+
+.left-pane,
+.right-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Glass Panels */
+.editor-container,
+.visualizer-container,
+.controls,
+.simulation-controls {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Editor Layout */
+.editor-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  /* Base background */
+  border-radius: 8px;
+  overflow: hidden;
+  /* Ensure rounded corners */
+  border: 1px solid var(--glass-border);
+}
+
+.code-backdrop {
+  margin: 0;
+  padding: 1rem;
+  /* Adjust padding-left to account for textarea padding if matched, but here we sync them */
+  /* Actually, we need to handle scroll sync perfectly or disable scroll on backdrop and make them identical.
+     Easiest for MVP: Use a monospace font and exact line-heights. */
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  width: 100%;
+  pointer-events: none;
+  /* Let clicks pass to textarea */
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  /* Match textarea default */
+  word-wrap: break-word;
+  /* Match textarea default */
+}
+
+textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: transparent;
+  /* Make see-through so backdrop shows */
+  border: none;
+  border-radius: 8px;
+  color: transparent;
+  /* Hide text color, show caret? No, we want to see text for editing. 
+     Wait, if we color transparent, we can't see cursor easily.
+     Standard trick: Textarea has color, backdrop has highlights. 
+     But highlighter is BEHIND. So active-line has background color. 
+     Backdrop text should be invisible or same color?
+     Ideally: Backdrop provides background colors. Textarea provides text.
+  */
+  color: #fff;
+  /* Visible text */
+  margin: 0;
+  padding: 1rem;
+  padding-left: 4.5rem;
+  /* Space for line numbers */
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  /* Includes padding in width */
+  overflow: auto;
+  z-index: 10;
+}
+
+.code-backdrop {
+  /* To match textarea perfectly including padding */
+  padding-left: 0;
+  /* We handle line number spacing inside lines */
+}
+
+.code-line {
+  display: flex;
+  padding-left: 1rem;
+  /* Original padding */
+  min-height: 1.5em;
+  /* Ensure empty lines have height */
+}
+
+.line-number {
+  display: inline-block;
+  width: 2rem;
+  color: var(--secondary-color);
+  text-align: right;
+  margin-right: 1.5rem;
+  font-size: 1rem;
+  /* Matched to code font size */
+  font-family: 'Fira Code', monospace;
+  /* Explicitly ensure mono font */
+  user-select: none;
+  opacity: 0.5;
+}
+
+.active-line {
+  background: rgba(234, 179, 8, 0.2);
+  /* Yellowish highlight */
+  box-shadow: inset 2px 0 0 0 #eab308;
+  width: 100%;
+  /* Note: width might be constrained by flex. */
+}
+
+/* Adjust backdrop line content to align with textarea text */
+.line-content {
+  visibility: hidden;
+  /* We don't need to see double text, just need correct height/wrapping */
+}
+
+/* Fix focus border */
+.editor-wrapper:focus-within {
+  border-color: var(--primary-color);
+}
+
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+}
+
+/* Buttons */
+.btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(110%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.run-btn {
+  width: 100%;
+}
+
+.nav-btn {
+  background: var(--secondary-color);
+}
+
+/* Simulation Controls */
+.simulation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.step-indicator {
+  text-align: center;
+}
+
+.current-line {
+  display: block;
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+}
+
+/* Visualizer */
+.visualizer-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: rgba(10, 10, 10, 0.85);
+  /* Darker hacker bg */
+  border-color: rgba(0, 255, 0, 0.3);
+  /* Terminal green border hint */
+}
+
+.stack-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #000;
+  /* Deep black */
+  border-radius: 4px;
+  overflow-y: auto;
+  border: 1px solid #333;
+}
+
+.stack-base {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.5rem;
+  border-top: 1px dashed #444;
+  padding-top: 0.5rem;
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+}
+
+.empty-stack {
+  text-align: center;
+  color: #444;
+  margin: auto;
+  font-family: 'Fira Code', monospace;
+}
+
+.stack-entries {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+}
+
+.stack-frame {
+  background: #111;
+  border: 1px solid #333;
+  border-left: 3px solid #0f0;
+  /* Neon execution line */
+  padding: 0;
+  /* Layout handled by children */
+  border-radius: 4px;
+  /* Slightly sharper */
+  display: flex;
+  align-items: stretch;
+  /* Full height */
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Fira Code', monospace;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.05);
+}
+
+.frame-left {
+  background: #0d0d0d;
+  padding: 0.75rem 0.5rem;
+  border-right: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+}
+
+.mem-address {
+  font-size: 0.7rem;
+  color: #666;
+  letter-spacing: 0.05em;
+}
+
+.frame-main {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.var-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.var-type {
+  font-size: 0.7rem;
+  color: #0f0;
+  /* Terminal Green */
+  text-transform: lowercase;
+}
+
+.var-size-badge {
+  font-size: 0.6rem;
+  background: #222;
+  color: #888;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid #333;
+}
+
+.var-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.var-name {
+  font-weight: bold;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.var-value {
+  font-size: 1.1rem;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
